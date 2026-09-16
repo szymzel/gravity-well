@@ -4,6 +4,7 @@
 #include <cmath>
 #include "raylib.h"
 #include "raymath.h"
+#include "rlgl.h"
 #include "renderer.h"
 #include "camera.h"
 #include "object.h"
@@ -18,10 +19,14 @@ const int height = GetMonitorHeight(GetCurrentMonitor());
 float forward, right, up;
 
 std::vector<Object*> objects;
+std::vector<Vector3> stars;
 
 int main(){
     InitWindow(width,height, "Okno Symulacji");
     ToggleFullscreen();
+    // Domyslna far-clipping distance w raylib to 1000 jednostek - po przeskalowaniu
+    // ukladu (Neptun ~750 jedn.) trzeba dac wiecej zapasu.
+    rlSetClipPlanes(RL_CULL_DISTANCE_NEAR, 5000.0);
 
     Camera3D camera = {0};
     camera.position = {10.0f, 10.0f, 10.0f};
@@ -42,6 +47,7 @@ int main(){
         orbits.push_back(orbit);
     }
 
+    GenerateStars(stars);
     while(!WindowShouldClose()){
         if (CameraActive==1){
             if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
@@ -65,14 +71,21 @@ int main(){
             orbits[i].Update(objects[i]->GetPosition());
         }
 
-        Step(objects, GetFrameTime());
+        // Ograniczenie dt zapobiega ogromnemu pierwszemu krokowi (inicjalizacja
+        // okna, ToggleFullscreen, generowanie 100 000 gwiazd - wszystko to
+        // wlicza sie w pierwszy GetFrameTime()), ktory potrafi w jednym kroku
+        // wystrzelic szybko orbitujace cialo (np. Ksiezyc, okres ~1.5s) daleko
+        // poza jego orbite, zanim symulacja na dobre ruszy.
+        float dt = fminf(GetFrameTime(), 1.0f / 30.0f);
+        Step(objects, dt);
         
         
         BeginDrawing();
             ClearBackground(BLACK);
             BeginMode3D(camera);
+                DrawStars(stars, camera);
                 Draw(objects);
-                DrawGrid(1000,5.0f);
+                DrawGrid(1000,10.0f);
                 for (const auto& orbit : orbits){
                     orbit.Draw();
                 }

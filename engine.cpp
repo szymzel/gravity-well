@@ -3,7 +3,11 @@
 #include "raymath.h"
 
 extern const float G = 1.0f;
-const float SOFTENING = 0.1f;
+// SOFTENING musi byc wyraznie mniejszy niz najmniejsza faktyczna odleglosc
+// w symulacji - a to teraz Fobos-Mars (~0.0125 jedn.), nie planeta-Slonce.
+// Przy starej wartosci (0.1) SOFTENING^3 dominowal nad dystans^3 dla bliskich
+// ksiezycow i tlumil ich grawitacje do ulamka procenta realnej sily.
+const float SOFTENING = 0.001f;
 
 std::vector<Vector3> ComputeAccelerations(std::vector<Object*>& objects){
     std::vector<Vector3> positions;

@@ -1,6 +1,8 @@
 #include "raylib.h"
 
-const float CAMERA_SPEED = 20.0f;
+
+
+const float CAMERA_SPEED = 50.0f;
 const float MOUSE_SENSIVITY = 0.1f;
 
 void GetMovementAxes(float &forward, float &right, float &up){
@@ -24,3 +26,4 @@ Vector3 rotation(){
     Vector2 MOUSE_DELTA = GetMouseDelta();
     return {MOUSE_DELTA.x * MOUSE_SENSIVITY, MOUSE_DELTA.y * MOUSE_SENSIVITY, 0.0f};
 }
+
