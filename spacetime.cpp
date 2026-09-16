@@ -8,7 +8,7 @@ const int grid_size = 100;
 const float spacing = 18.0f;                 
 const float offset = (grid_size * spacing)/2.0f;
 
-float epsilon = 4.0f;
+float epsilon = 400.0f;
 
 const float HEIGHT_ERROR_THRESHOLD = 0.2f;
 const int MAX_SUBDIVISIONS = 12;

@@ -34,7 +34,7 @@ int main(){
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    alpha_centauri_system(objects);
+    CygnusX1(objects);
 
     int CameraActive = 0;
     DisableCursor();

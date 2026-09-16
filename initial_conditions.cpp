@@ -4,7 +4,35 @@
 #include "initial_conditions.h"
 #include "engine.h"
 
-//this is all ai generated, because it's a lot of work to implement these data
+//this is almost all ai generated, because it's a lot of work to implement these data
+
+void SagittariusA(std::vector<Object*>& objects){
+    constexpr float SUN_MASS = 1000.0f;
+    constexpr float KM_TO_UNITS = 5.0e-7f;
+    constexpr float RADIUS_SCALE = 20.0f;
+    Object* saggitarius_a = new Object("Sgr A*", Color{20, 20, 20, 255},
+    696340.0f * KM_TO_UNITS * RADIUS_SCALE * 18, 4*powf(10,6),
+    Vector3Zero(), Vector3Zero(), Vector3Zero());
+
+    objects.push_back(saggitarius_a);
+}
+
+void CygnusX1(std::vector<Object*>& objects){
+    constexpr float SUN_MASS = 1000.0f;
+    constexpr float KM_TO_UNITS = 5.0e-7f;
+    constexpr float RADIUS_SCALE = 20.0f;
+    
+    float cygnusMass = 21.0f * SUN_MASS;
+    
+    constexpr float VISIBILITY_MULTIPLIER = 5000.0f; 
+    float cygnusRadius = 63.0f * KM_TO_UNITS * RADIUS_SCALE;
+
+    Object* cygnus_x1 = new Object("Cygnus X-1", Color{120, 0, 255, 255}, 
+        cygnusRadius, cygnusMass,
+        Vector3Zero(), Vector3Zero(), Vector3Zero());
+
+    objects.push_back(cygnus_x1);
+}
 
 void solar_sytem_in_real_scale(std::vector<Object*>& objects)
 {

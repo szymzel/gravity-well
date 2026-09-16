@@ -1,0 +1,8 @@
+# Compiled binary (built via `make`)
+gravity_well
+
+# macOS
+.DS_Store
+
+# Editor config (contains machine-specific paths, e.g. Homebrew Cellar path)
+.vscode/
