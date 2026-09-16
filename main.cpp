@@ -11,6 +11,7 @@
 #include "initial_conditions.h"
 #include "engine.h"
 #include "orbit_trail.h"
+#include "spacetime.h"
 
 const int width = GetMonitorWidth(GetCurrentMonitor());
 const int height = GetMonitorHeight(GetCurrentMonitor());
@@ -24,8 +25,6 @@ std::vector<Vector3> stars;
 int main(){
     InitWindow(width,height, "Okno Symulacji");
     ToggleFullscreen();
-    // Domyslna far-clipping distance w raylib to 1000 jednostek - po przeskalowaniu
-    // ukladu (Neptun ~750 jedn.) trzeba dac wiecej zapasu.
     rlSetClipPlanes(RL_CULL_DISTANCE_NEAR, 5000.0);
 
     Camera3D camera = {0};
@@ -35,7 +34,7 @@ int main(){
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    solar_sytem_in_real_scale(objects);
+    alpha_centauri_system(objects);
 
     int CameraActive = 0;
     DisableCursor();
@@ -71,11 +70,7 @@ int main(){
             orbits[i].Update(objects[i]->GetPosition());
         }
 
-        // Ograniczenie dt zapobiega ogromnemu pierwszemu krokowi (inicjalizacja
-        // okna, ToggleFullscreen, generowanie 100 000 gwiazd - wszystko to
-        // wlicza sie w pierwszy GetFrameTime()), ktory potrafi w jednym kroku
-        // wystrzelic szybko orbitujace cialo (np. Ksiezyc, okres ~1.5s) daleko
-        // poza jego orbite, zanim symulacja na dobre ruszy.
+        
         float dt = fminf(GetFrameTime(), 1.0f / 30.0f);
         Step(objects, dt);
         
@@ -85,7 +80,8 @@ int main(){
             BeginMode3D(camera);
                 DrawStars(stars, camera);
                 Draw(objects);
-                DrawGrid(1000,10.0f);
+                
+                DrawSpacetime(objects);
                 for (const auto& orbit : orbits){
                     orbit.Draw();
                 }
