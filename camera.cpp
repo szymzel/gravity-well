@@ -1,6 +1,6 @@
 #include "raylib.h"
 
-const float CAMERA_SPEED = 5.0f;
+const float CAMERA_SPEED = 20.0f;
 const float MOUSE_SENSIVITY = 0.1f;
 
 void GetMovementAxes(float &forward, float &right, float &up){

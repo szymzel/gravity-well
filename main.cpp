@@ -9,6 +9,7 @@
 #include "object.h"
 #include "initial_conditions.h"
 #include "engine.h"
+#include "orbit_trail.h"
 
 const int width = GetMonitorWidth(GetCurrentMonitor());
 const int height = GetMonitorHeight(GetCurrentMonitor());
@@ -34,6 +35,13 @@ int main(){
     int CameraActive = 0;
     DisableCursor();
 
+    std::vector<Orbit_Trail> orbits;
+    size_t max_points = 10000;
+    for (size_t i = 0; i < objects.size();i++){
+        Orbit_Trail orbit(max_points, objects[i]->GetColor());
+        orbits.push_back(orbit);
+    }
+
     while(!WindowShouldClose()){
         if (CameraActive==1){
             if(IsMouseButtonPressed(MOUSE_BUTTON_LEFT)){
@@ -53,12 +61,21 @@ int main(){
             Vector3 rot = rotation();
             UpdateCameraPro(&camera, move, rot, 0.0f);
         }
+        for (size_t i = 0; i < orbits.size(); i++){
+            orbits[i].Update(objects[i]->GetPosition());
+        }
+
         Step(objects, GetFrameTime());
+        
+        
         BeginDrawing();
             ClearBackground(BLACK);
             BeginMode3D(camera);
                 Draw(objects);
                 DrawGrid(1000,5.0f);
+                for (const auto& orbit : orbits){
+                    orbit.Draw();
+                }
             EndMode3D();
             DrawLabels(objects, camera);
         EndDrawing();

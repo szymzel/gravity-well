@@ -36,3 +36,4 @@ void DrawLabels(const std::vector<Object*>& objects, Camera3D camera){
             (int)screenPosition.y, fontSize, WHITE);
     }
 }
+

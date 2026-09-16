@@ -9,7 +9,7 @@ void solar_sytem_in_real_scale(std::vector<Object*>& objects){
 
     const float RADIUS_SCALE = 40.0f;
 
-    Object* sun = new Object("Sun", Color{253, 184, 19, 255}, 0.04655f * RADIUS_SCALE, sunMass, Vector3Zero(), Vector3Zero(), Vector3Zero());
+    Object* sun = new Object("Sun", Color{255, 255, 255, 255}, 0.04655f * RADIUS_SCALE, sunMass, Vector3Zero(), Vector3Zero(), Vector3Zero());
 
     float mercuryDist = 3.9f, mercuryAngle = 0.0f * DEG2RAD;
     Object* mercury = new Object("Mercury", Color{168, 168, 168, 255}, 0.0001631f * RADIUS_SCALE, 1.66e-5f,
@@ -69,3 +69,55 @@ void solar_sytem_in_real_scale(std::vector<Object*>& objects){
     objects.push_back(uranus);
     objects.push_back(neptune);
 }
+
+
+void alpha_centauri_system(std::vector<Object*>& objects){
+    const float massA = 107.88f;       
+    const float massB = 90.92f;        
+    const float massProxima = 12.21f;  
+
+    const float RADIUS_SCALE = 40.0f;
+    const float radiusA = 0.05693f * RADIUS_SCALE;        
+    const float radiusB = 0.04017f * RADIUS_SCALE;        
+    const float radiusProxima = 0.007174f * RADIUS_SCALE; 
+
+
+    const float aAB = 235.0f; 
+    const float eAB = 0.5179f;
+    const float GM_AB = G * (massA + massB);
+
+    const float rPeriAB = aAB * (1.0f - eAB);
+    const float vPeriAB = sqrtf(GM_AB * (1.0f + eAB) / rPeriAB); 
+
+    const float fracA = massB / (massA + massB);
+    const float fracB = massA / (massA + massB); 
+
+    Object* alphaA = new Object("Alpha Centauri A", Color{255, 241, 199, 255}, radiusA, massA,
+        {-fracA * rPeriAB, 0.0f, 0.0f},
+        {0.0f, 0.0f, -fracA * vPeriAB},
+        Vector3Zero());
+
+    Object* alphaB = new Object("Alpha Centauri B", Color{255, 199, 120, 255}, radiusB, massB,
+        {fracB * rPeriAB, 0.0f, 0.0f},
+        {0.0f, 0.0f, fracB * vPeriAB},
+        Vector3Zero());
+
+
+    const float aProxima = 87000.0f;
+    const float eProxima = 0.50f;
+
+    const float rPeriProxima = aProxima * (1.0f - eProxima);
+    const float vPeriProxima = sqrtf(GM_AB * (1.0f + eProxima) / rPeriProxima);
+
+    Object* proxima = new Object("Proxima Centauri", Color{255, 96, 74, 255}, radiusProxima, massProxima,
+        {rPeriProxima, 0.0f, 0.0f},
+        {0.0f, 0.0f, vPeriProxima},
+        Vector3Zero());
+
+    objects.push_back(alphaA);
+    objects.push_back(alphaB);
+    objects.push_back(proxima);
+}
+
+
+
