@@ -704,6 +704,107 @@ void solar_sytem_in_real_scale(std::vector<Object*>& objects)
     objects.push_back(hygiea);
 }
 
+// ---------------------------------------------------------------------------
+// Uklad Sloneczny w skali "do ogladania" (celowo nierealnej):
+//  - odleglosci planet od Slonca sciesnione: planety wewnetrzne w prawie
+//    realnych proporcjach, zewnetrzne mocno przysuniete (Neptun 6x dalej od
+//    Ziemi zamiast 30x), zeby caly uklad miescil sie w kadrze,
+//  - promienie cial mocno powiekszone, zeby kazde bylo widoczne jako kulka,
+//  - ksiezyce kraza tuz przy planetach (do ~1/4 promienia Hilla - dalej
+//    plywy Slonca widocznie deformuja ich orbity),
+//  - masy Ziemi i Marsa zawyzone (realne stosunki w komentarzach), inaczej
+//    ich sfery Hilla bylyby za male na widoczne ksiezyce; zbyt duze masy
+//    z kolei deformuja orbity sasiednich planet - stad te konkretne wartosci.
+// Tempo: rok ziemski trwa EARTH_YEAR_SECONDS, reszta wynika z III prawa
+// Keplera (Merkury ~7 s, Jowisz ~100 s, Neptun ~6 min, Ksiezyc ~2 s).
+// ---------------------------------------------------------------------------
+
+// Tworzy cialo na orbicie kolowej wokol `parent` (plaszczyzna XZ, faza `angleDeg`),
+// dodaje je do `objects` i zwraca wskaznik, zeby mozna bylo doczepic ksiezyce.
+static Object* AddOrbiter(std::vector<Object*>& objects, const std::string& name,
+                          Color color, float radius, float mass,
+                          const Object* parent, float distance, float angleDeg,
+                          bool retrograde = false)
+{
+    float angle = angleDeg * DEG2RAD;
+    Vector3 offset  = { distance * cosf(angle), 0.0f, distance * sinf(angle) };
+    Vector3 tangent = { -sinf(angle), 0.0f, cosf(angle) };
+    if (retrograde) tangent = Vector3Negate(tangent);
+
+    float speed = sqrtf(G * (parent->GetMass() + mass) / distance);
+
+    Object* body = new Object(name, color, radius, mass,
+        Vector3Add(parent->GetPosition(), offset),
+        Vector3Add(parent->GetVelocity(), Vector3Scale(tangent, speed)),
+        Vector3Zero());
+    objects.push_back(body);
+    return body;
+}
+
+void solar_system(std::vector<Object*>& objects)
+{
+    constexpr float EARTH_DIST         = 88.0f;
+    constexpr float EARTH_YEAR_SECONDS = 24.0f;
+    // III prawo Keplera: M = 4 pi^2 a^3 / (G T^2)  ->  ok. 46 700
+    const float SUN_MASS = 4.0f * PI * PI * EARTH_DIST * EARTH_DIST * EARTH_DIST
+                         / (G * EARTH_YEAR_SECONDS * EARTH_YEAR_SECONDS);
+
+    const size_t first = objects.size();
+
+    Object* sun = new Object("Sun", Color{255, 225, 120, 255}, 6.0f, SUN_MASS,
+                             Vector3Zero(), Vector3Zero(), Vector3Zero());
+    objects.push_back(sun);
+
+    // Planety:                                                     promien  masa [Slonca] (realnie)     odleglosc  faza
+    AddOrbiter(objects,                  "Mercury", Color{168, 168, 168, 255}, 0.32f, SUN_MASS * 1.7e-7f,             sun,  40.0f,  20.0f);
+    AddOrbiter(objects,                  "Venus",   Color{230, 200, 130, 255}, 0.48f, SUN_MASS * 2.5e-6f,             sun,  62.0f, 130.0f);
+    Object* earth   = AddOrbiter(objects, "Earth",   Color{ 70, 130, 180, 255}, 0.50f, SUN_MASS * 4.0e-4f, /*3.0e-6*/ sun,  88.0f, 250.0f);
+    Object* mars    = AddOrbiter(objects, "Mars",    Color{193,  68,  14, 255}, 0.42f, SUN_MASS * 3.0e-4f, /*3.2e-7*/ sun, 122.0f,  70.0f);
+    Object* jupiter = AddOrbiter(objects, "Jupiter", Color{216, 179, 130, 255}, 1.60f, SUN_MASS * 8.0e-4f, /*9.5e-4*/ sun, 230.0f, 310.0f);
+    Object* saturn  = AddOrbiter(objects, "Saturn",  Color{235, 214, 162, 255}, 1.40f, SUN_MASS * 5.0e-4f, /*2.9e-4*/ sun, 320.0f, 150.0f);
+    Object* uranus  = AddOrbiter(objects, "Uranus",  Color{172, 229, 238, 255}, 0.95f, SUN_MASS * 1.5e-4f, /*4.4e-5*/ sun, 430.0f,  40.0f);
+    Object* neptune = AddOrbiter(objects, "Neptune", Color{ 62,  84, 191, 255}, 0.95f, SUN_MASS * 1.5e-4f, /*5.2e-5*/ sun, 540.0f, 220.0f);
+
+    // Pas planetoid (miedzy Marsem a Jowiszem)
+    AddOrbiter(objects, "Vesta",  Color{180, 175, 165, 255}, 0.12f, SUN_MASS * 1.3e-10f, sun, 152.0f, 300.0f);
+    AddOrbiter(objects, "Ceres",  Color{160, 150, 140, 255}, 0.16f, SUN_MASS * 4.7e-10f, sun, 160.0f, 180.0f);
+    AddOrbiter(objects, "Pallas", Color{130, 125, 120, 255}, 0.12f, SUN_MASS * 1.0e-10f, sun, 166.0f,  15.0f);
+    AddOrbiter(objects, "Hygiea", Color{110, 105, 100, 255}, 0.11f, SUN_MASS * 4.2e-11f, sun, 175.0f, 100.0f);
+
+    // Ksiezyce (masy realne wzgledem Slonca - dynamicznie bez znaczenia)
+    AddOrbiter(objects, "Moon",     Color{200, 200, 200, 255}, 0.13f, SUN_MASS * 3.7e-8f, earth,   1.2f,   0.0f);
+
+    AddOrbiter(objects, "Phobos",   Color{130, 120, 110, 255}, 0.07f, SUN_MASS * 1.0e-9f, mars,    1.0f,   0.0f);
+    AddOrbiter(objects, "Deimos",   Color{120, 110, 100, 255}, 0.06f, SUN_MASS * 1.0e-9f, mars,    1.5f, 180.0f);
+
+    AddOrbiter(objects, "Io",       Color{230, 210, 120, 255}, 0.20f, SUN_MASS * 4.5e-8f, jupiter, 2.3f,   0.0f);
+    AddOrbiter(objects, "Europa",   Color{210, 190, 160, 255}, 0.17f, SUN_MASS * 2.4e-8f, jupiter, 2.8f,  90.0f);
+    AddOrbiter(objects, "Ganymede", Color{150, 140, 130, 255}, 0.25f, SUN_MASS * 7.5e-8f, jupiter, 3.3f, 180.0f);
+    AddOrbiter(objects, "Callisto", Color{110, 100,  90, 255}, 0.23f, SUN_MASS * 5.4e-8f, jupiter, 3.9f, 270.0f);
+
+    AddOrbiter(objects, "Rhea",     Color{190, 190, 190, 255}, 0.13f, SUN_MASS * 1.2e-9f, saturn,  2.2f, 120.0f);
+    AddOrbiter(objects, "Titan",    Color{200, 150,  80, 255}, 0.25f, SUN_MASS * 6.8e-8f, saturn,  3.0f,   0.0f);
+    AddOrbiter(objects, "Iapetus",  Color{150, 140, 120, 255}, 0.12f, SUN_MASS * 9.0e-10f, saturn, 4.2f, 240.0f);
+
+    AddOrbiter(objects, "Titania",  Color{170, 170, 180, 255}, 0.13f, SUN_MASS * 1.7e-9f, uranus,  1.7f,   0.0f);
+    AddOrbiter(objects, "Oberon",   Color{160, 155, 150, 255}, 0.13f, SUN_MASS * 1.5e-9f, uranus,  2.3f, 180.0f);
+
+    AddOrbiter(objects, "Triton",   Color{225, 215, 220, 255}, 0.18f, SUN_MASS * 1.1e-8f, neptune, 2.1f,   0.0f, /*retrograde*/ true);
+
+    // Wyzeruj ped calkowity ukladu: Slonce startuje w spoczynku, a planety maja
+    // niezerowy ped, wiec bez tego caly uklad powoli odplywalby od srodka sceny.
+    Vector3 momentum  = Vector3Zero();
+    float   totalMass = 0.0f;
+    for (size_t i = first; i < objects.size(); i++){
+        momentum   = Vector3Add(momentum, Vector3Scale(objects[i]->GetVelocity(), objects[i]->GetMass()));
+        totalMass += objects[i]->GetMass();
+    }
+    Vector3 driftVelocity = Vector3Scale(momentum, 1.0f / totalMass);
+    for (size_t i = first; i < objects.size(); i++){
+        objects[i]->AddToVelocity(Vector3Negate(driftVelocity));
+    }
+}
+
 void alpha_centauri_system(std::vector<Object*>& objects)
 {
     constexpr float SOLAR_MASS_UNIT = 1000.0f;

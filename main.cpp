@@ -28,13 +28,13 @@ int main(){
     rlSetClipPlanes(RL_CULL_DISTANCE_NEAR, 5000.0);
 
     Camera3D camera = {0};
-    camera.position = {10.0f, 10.0f, 10.0f};
+    camera.position = {0.0f, 100.0f, 160.0f};
     camera.target = {0.0f, 0.0f, 0.0f};
     camera.up = {0.0f, 1.0f, 0.0f};
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    CygnusX1(objects);
+    solar_system(objects);
 
     int CameraActive = 0;
     DisableCursor();
@@ -65,6 +65,7 @@ int main(){
             Vector3 move = movement(forward, right ,up);
             Vector3 rot = rotation();
             UpdateCameraPro(&camera, move, rot, 0.0f);
+            Zoom(camera);
         }
         for (size_t i = 0; i < orbits.size(); i++){
             orbits[i].Update(objects[i]->GetPosition());

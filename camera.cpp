@@ -5,6 +5,11 @@
 const float CAMERA_SPEED = 50.0f;
 const float MOUSE_SENSIVITY = 0.1f;
 
+void Zoom(Camera3D& camera){
+    float wheel = GetMouseWheelMove();
+    if (wheel == 0.0f) return;
+}
+
 void GetMovementAxes(float &forward, float &right, float &up){
     forward = 0.0f;
     right = 0.0f;
