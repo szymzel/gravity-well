@@ -4,8 +4,8 @@
 #include "object.h"
 
 
-const int grid_size = 100;
-const float spacing = 18.0f;                 
+const int grid_size = 130;
+const float spacing = 28.0f;                 
 const float offset = (grid_size * spacing)/2.0f;
 
 float epsilon = 400.0f;

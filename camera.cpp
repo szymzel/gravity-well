@@ -1,13 +1,18 @@
 #include "raylib.h"
+#include <cmath>
+#include "raymath.h"
 
 
-
-const float CAMERA_SPEED = 50.0f;
+static float camera_speed = 50.0f;
 const float MOUSE_SENSIVITY = 0.1f;
 
 void Zoom(Camera3D& camera){
-    float wheel = GetMouseWheelMove();
+    float wheel = GetMouseWheelMove() * 0.1f;
     if (wheel == 0.0f) return;
+    wheel = Clamp(wheel, -1.0f, 1.0f);
+    camera_speed = Clamp(camera_speed * powf(1.2f, wheel), 0.4f, 200.0f);
+    
+
 }
 
 void GetMovementAxes(float &forward, float &right, float &up){
@@ -23,7 +28,7 @@ void GetMovementAxes(float &forward, float &right, float &up){
     if (IsKeyDown(KEY_LEFT_CONTROL)) up -= 1.0f;
 }
 Vector3 movement(float forward, float  right, float up){
-    float scale = CAMERA_SPEED * GetFrameTime();
+    float scale = camera_speed * GetFrameTime();
     return {forward * scale, right * scale, up * scale};
 }
 
