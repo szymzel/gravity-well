@@ -2,6 +2,8 @@
 
 C++17 N-body gravity simulator rendered with raylib. Simulates orbital mechanics between objects (stars, planets, black holes) with mutual gravitational attraction, orbit trails, and a visual spacetime grid that warps under mass.
 
+![Demo](assets/demo.gif)
+
 ## Requirements
 
 - C++17 compiler (`clang++`)

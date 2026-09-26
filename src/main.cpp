@@ -34,7 +34,7 @@ int main(){
     camera.fovy = 45.0f;
     camera.projection = CAMERA_PERSPECTIVE;
 
-    solar_sytem_in_real_scale(objects);
+    alpha_centauri_system(objects);
 
     int CameraActive = 0;
     DisableCursor();
