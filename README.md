@@ -4,6 +4,7 @@ C++17 N-body gravity simulator rendered with raylib. Simulates orbital mechanics
 
 ![Demo](assets/demo.gif)
 
+Full video on YouTube: [https://www.youtube.com/watch?v=dEuS29LzjH0](https://www.youtube.com/watch?v=dEuS29LzjH0)
 ## Requirements
 
 - C++17 compiler (`clang++`)
